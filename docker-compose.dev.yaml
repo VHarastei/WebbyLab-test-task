@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  front:
+    container_name: movies
+    image: vharastei/movies
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./src:/app/src
+      # - ./src:/app
+    ports:
+      - 3000:3000
+  api:
+    image: "webbylabhub/movies"
+    ports:
+      - "8000:8000"

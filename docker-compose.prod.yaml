@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  front:
+    image: "vharastei/movies"
+    ports:
+      - "3000:3000"
+  api:
+    image: "webbylabhub/movies"
+    ports:
+      - "8000:8000"
