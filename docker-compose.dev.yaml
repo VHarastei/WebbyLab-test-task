@@ -9,7 +9,6 @@ services:
       target: development
     volumes:
       - ./src:/app/src
-      # - ./src:/app
     ports:
       - 3000:3000
   api:
