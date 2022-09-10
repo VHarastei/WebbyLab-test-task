@@ -1,34 +1,98 @@
-import { Box, Container, Link, Paper } from '@mui/material';
+import { Box, Button, Container, Link, Paper, Typography } from '@mui/material';
 import { Link as RouterLink, Route, Routes } from 'react-router-dom';
-import { Movie } from './pages/Movie';
-import { Movies } from './pages/Movies';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { useAppDispatch, useAppSelector } from './hooks/store';
+import { ImportMoviePage } from './pages/ImportMoviePage';
+import { MoviePage } from './pages/MoviePage';
+import { MoviesPage } from './pages/MoviesPage';
+import SignInPage from './pages/SignInPage';
+import SignUpPage from './pages/SignUpPage';
+import { logOut, selectUser } from './store/slices/userSlice';
 
 function App() {
-  // useEffect(() => {
-  //   const get = async () => {
-  //     axios.get('http://localhost:8000/api/v1/movies?sort=year&order=DESC&limit=10&offset=0', {
-  //       headers: {
-  //         Authorization:
-  //           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJnYXJhc3RleS52YXNAZ21haWwuY29tIiwibmFtZSI6IlZIYXJhc3RlciIsImNyZWF0ZWRBdCI6IjIwMjItMDktMDhUMTY6NDg6NTcuNTE2WiIsInVwZGF0ZWRBdCI6IjIwMjItMDktMDhUMTY6NDg6NTcuNTE2WiIsImlhdCI6MTY2MjY1NTczN30.igFPhAeiujgFynw-0srU3V_h9Q1E0dahyr-9Y0C-yn4',
-  //       },
-  //     });
-  //   };
+  const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
 
-  //   get();
-  // }, []);
+  const handleLogOut = () => {
+    dispatch(logOut());
+  };
 
   return (
-    <Container>
+    <Container maxWidth="md">
       <Paper elevation={5}>
         <Box p={1} display="flex" gap={1}>
-          <Link component={RouterLink} to="/">
-            Home
-          </Link>
+          {!!user ? (
+            <Box display="flex" justifyContent="space-between" sx={{ width: '100%' }}>
+              <Box display="flex" gap={1}>
+                <Link component={RouterLink} to="/">
+                  <Typography fontSize={24}>Home</Typography>
+                </Link>
+                <Link component={RouterLink} to="/movies/import">
+                  <Typography fontSize={24}>Import movies</Typography>
+                </Link>
+              </Box>
+              <Box display="flex" gap={1}>
+                <Typography fontSize={18}>{user.email}</Typography>
+                <Button variant="contained" onClick={handleLogOut}>
+                  Log Out
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <>
+              <Link component={RouterLink} to="/sign-in">
+                <Typography fontSize={24}>Sign In</Typography>
+              </Link>
+              <Link component={RouterLink} to="/sign-up">
+                <Typography fontSize={24}>Sign Up</Typography>
+              </Link>
+            </>
+          )}
         </Box>
       </Paper>
+
       <Routes>
-        <Route path="/" element={<Movies />} />
-        <Route path="/movies/:movieId" element={<Movie />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute isAuth={!!user}>
+              <MoviesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/movies/:movieId"
+          element={
+            <ProtectedRoute isAuth={!!user}>
+              <MoviePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/movies/import"
+          element={
+            <ProtectedRoute isAuth={!!user}>
+              <ImportMoviePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sign-in"
+          element={
+            <ProtectedRoute isAuth={!!!user} redirectPath="/">
+              <SignInPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sign-up"
+          element={
+            <ProtectedRoute isAuth={!!!user} redirectPath="/">
+              <SignUpPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Container>
   );
