@@ -27,8 +27,8 @@ export interface GetMoviesPayload {
   offset: number | null;
 }
 
-export interface Response<D, M = void> {
-  data: D;
+export interface Response<D = void, M = void> {
+  data?: D;
   meta?: M;
   status: number;
 }
@@ -42,6 +42,10 @@ export interface PaginationMeta {
   total: number;
 }
 
+export interface ImportMeta extends PaginationMeta {
+  imported: number;
+}
+
 export const Api = {
   signUp: (paylod: SignUpFormValues): Promise<AuthResponse> =>
     instance.post(`/users`, paylod).then(({ data }) => data),
@@ -49,10 +53,10 @@ export const Api = {
   signIn: (paylod: SignInFormValues): Promise<AuthResponse> =>
     instance.post(`/sessions`, paylod).then(({ data }) => data),
 
-  addMovie: (paylod: AddMovieFormValues): Promise<FullMovie> =>
+  addMovie: (paylod: AddMovieFormValues): Promise<Response<FullMovie>> =>
     instance.post(`/movies`, paylod).then(({ data }) => data),
 
-  deleteMovie: (id: number): Promise<void> => instance.delete(`/movies/${id}`),
+  deleteMovie: (id: number): Promise<Response> => instance.delete(`/movies/${id}`),
 
   getMovie: (id: number): Promise<Response<FullMovie>> =>
     instance.get(`/movies/${id}`).then(({ data }) => data),
@@ -62,7 +66,7 @@ export const Api = {
       .get(`/movies${qs.stringify(payload, { addQueryPrefix: true, skipNulls: true })}`)
       .then(({ data }) => data),
 
-  importMovies: (payload: FormData): Promise<Response<ShortMovie[], PaginationMeta>> =>
+  importMovies: (payload: FormData): Promise<Response<ShortMovie[], ImportMeta>> =>
     instance
       .post(`/movies/import`, payload, {
         headers: { 'Content-Type': 'multipart/form-data' },

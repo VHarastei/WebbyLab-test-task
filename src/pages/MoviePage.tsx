@@ -3,7 +3,12 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { FullMovieCard } from '../components/FullMovieCard';
 import { useAppDispatch, useAppSelector } from '../hooks/store';
-import { fetchMovie, selectMovie, selectMovieLoadingStatus } from '../store/slices/movieSlice';
+import {
+  fetchMovie,
+  resetMovieState,
+  selectMovie,
+  selectMovieLoadingStatus,
+} from '../store/slices/movieSlice';
 import { Status } from '../types';
 
 export const MoviePage = () => {
@@ -16,6 +21,10 @@ export const MoviePage = () => {
 
   useEffect(() => {
     if (movieId) dispatch(fetchMovie(+movieId));
+
+    return () => {
+      dispatch(resetMovieState());
+    };
   }, [movieId, dispatch]);
 
   if (loadingStatus === Status.LOADING) return <CircularProgress />;
@@ -25,7 +34,7 @@ export const MoviePage = () => {
       {loadingStatus === Status.SUCCESS && movie ? (
         <FullMovieCard movie={movie} />
       ) : (
-        'Something went wrong'
+        loadingStatus === Status.ERROR && 'Something went wrong'
       )}
     </Box>
   );

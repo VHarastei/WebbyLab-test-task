@@ -16,15 +16,16 @@ const initialState: MoviesState = {
 };
 
 export const fetchMovies = createAsyncThunk<
-  Response<ShortMovie[], PaginationMeta> | null,
+  Response<ShortMovie[], PaginationMeta>,
   GetMoviesPayload
 >('movies/fetchMovies', async (payload: GetMoviesPayload) => {
-  const movies = await Api.getMovies(payload);
+  const response = await Api.getMovies(payload);
 
-  if (movies.status === ResultCodes.SUCCESS) {
-    return movies;
+  if (response.data && response.meta && response.status === ResultCodes.SUCCESS) {
+    return response;
   }
-  return null;
+
+  throw new Error('Something went wrong');
 });
 
 export const moviesSlice = createSlice({
@@ -35,7 +36,7 @@ export const moviesSlice = createSlice({
     builder
       .addCase(
         fetchMovies.fulfilled.type,
-        (state, { payload }: PayloadAction<Response<ShortMovie[], PaginationMeta> | null>) => {
+        (state, { payload }: PayloadAction<Response<ShortMovie[], PaginationMeta>>) => {
           state.items = payload?.data || [];
           state.meta = payload?.meta || null;
           state.loadingStatus = Status.SUCCESS;

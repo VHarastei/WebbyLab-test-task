@@ -101,7 +101,7 @@ export const MoviesPage = () => {
             />
           </Box>
         ) : (
-          'Something went wrong'
+          loadingStatus === Status.ERROR && 'Something went wrong'
         )}
       </Box>
     </>

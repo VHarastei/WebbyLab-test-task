@@ -5,7 +5,7 @@ export interface Actor {
   updatedAt: string;
 }
 
-export type MovieFormat = 'VHS' | 'DVD' | 'Blu-ray';
+export type MovieFormat = 'VHS' | 'DVD' | 'Blu-Ray';
 
 export interface ShortMovie {
   id: number;
